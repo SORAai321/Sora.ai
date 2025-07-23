@@ -1,0 +1,37 @@
+name: Build Sora APK
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'sora_v0.1_android.zip'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y python3 python3-pip zip unzip openjdk-11-jdk
+
+      - name: Unzip Sora Project
+        run: unzip -o sora_v0.1_android.zip -d sora_project
+
+      - name: Install Buildozer
+        run: |
+          python3 -m pip install --upgrade pip
+          pip3 install buildozer
+
+      - name: Build APK
+        working-directory: sora_project
+        run: buildozer android debug
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: sora-v0.1-deb
